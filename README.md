@@ -298,7 +298,7 @@ agent = MultilingualResearchAgent(enable_repair=True)
 
 **Last Updated**: 2025-10-07
 
-**Version**: 1.0.0
+**Version**: 1.0.2
 
-**Status**: ✅ Complete
+
 

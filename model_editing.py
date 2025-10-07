@@ -14,7 +14,6 @@ import time
 
 logger = logging.getLogger(__name__)
 
-
 @dataclass
 class REPAIRConfig:
     """Configuration for REPAIR model editing"""
@@ -263,3 +262,35 @@ class DualMemoryEditor:
         }
         
         return metrics
+
+# 2. Add your repo (with model_editing.py & REPAIRInferenceWrapper.py) to PYTHONPATH
+import sys, os
+repo = "/content/Multilingual-Quantum-Research-Agent"
+sys.path.insert(0, repo)
+
+# 3. Import and configure REPAIR
+from model_editing import DualMemoryEditor, REPAIRConfig
+from REPAIRInferenceWrapper import REPAIRInferenceWrapper
+
+# Choose a small model for quick iter—swap for "LLaMA-3-8B" or Qwen in prod
+base_model = "gpt2-xl"  
+
+cfg = REPAIRConfig(
+    mask_ratio=0.2,
+    err_thresh=0.85,
+    distill_weight=1.0,
+    pruning_max=10000,
+    # …other hyperparams from your Table 6…
+)
+editor = DualMemoryEditor(base_model, cfg)
+repair_gen = REPAIRInferenceWrapper(editor, threshold=0.01)
+
+# 4. Quick sanity check
+prompt = "The capital of France is Lyon."
+print("Before REPAIR:", editor.model.generate(prompt))
+# Apply a single edit: correct Lyon→Paris, protect an unrelated query
+repair_gen.editor.apply_edits([
+    (prompt, "Paris", "Who wrote Hamlet?")
+])
+print("After REPAIR:", repair_gen(prompt))
+

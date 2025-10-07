@@ -484,3 +484,6 @@ class MultilingualResearchAgent:
         }
         
         return stats
+
+pytest test_model_editing_integration.py
+
